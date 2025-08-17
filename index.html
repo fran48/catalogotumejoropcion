@@ -73,25 +73,26 @@
     // --------------------
     const USER = "Belen192226";
     const PASS = "Fran192226";
+    let isAdmin = false;   // Estado global admin
+    let productosData = []; // Guardamos todos los productos
+    let editId = null;      // ID del producto que estamos editando
 
     function login() {
       const user = document.getElementById("username").value;
       const pass = document.getElementById("password").value;
       if(user === USER && pass === PASS) {
+        isAdmin = true;
         document.getElementById("login").classList.add("hidden");
         document.getElementById("adminPanel").classList.remove("hidden");
-        mostrarProductos(true);
+        renderizarProductos(); // 🔹 Redibujar catálogo con botones admin
       } else {
         alert("Usuario o contraseña incorrectos");
       }
     }
 
     // --------------------
-    // Mostrar productos
+    // Escuchar cambios en productos
     // --------------------
-    let productosData = [];
-    let editId = null; // guardamos el id del producto a editar
-
     db.collection("productos").onSnapshot((querySnapshot) => {
       productosData = [];
       querySnapshot.forEach((doc) => {
@@ -100,10 +101,13 @@
       renderizarProductos();
     });
 
+    // --------------------
+    // Mostrar productos
+    // --------------------
     function renderizarProductos(filtro="") {
       const contenedor = document.getElementById("productos");
-      const isAdmin = !document.getElementById("adminPanel").classList.contains("hidden");
       contenedor.innerHTML = "";
+
       productosData
         .filter(p => p.name.toLowerCase().includes(filtro.toLowerCase()))
         .forEach((p) => {
@@ -120,6 +124,10 @@
             </div>
           `;
         });
+
+      if (contenedor.innerHTML === "") {
+        contenedor.innerHTML = "<p>No hay productos</p>";
+      }
     }
 
     // --------------------
@@ -209,10 +217,6 @@
       renderizarProductos(valor);
     }
 
-    // --------------------
-    // Inicializar catálogo
-    // --------------------
-    renderizarProductos();
   </script>
 
 </body>
