@@ -1,41 +1,120 @@
+/* ======= ESTILOS GENERALES ======= */
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, sans-serif;
   text-align: center;
   padding: 20px;
-  background: #f4f4f4;
+  background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+  color: #333;
+}
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+}
+
+input {
+  padding: 10px;
+  margin: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  width: 250px;
 }
 
 .hidden { display: none; }
 
+/* ======= GRID DE PRODUCTOS ======= */
 #productos {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+  margin-top: 25px;
 }
 
+/* ======= TARJETAS ======= */
 .producto {
   background: white;
-  padding: 10px;
-  border-radius: 10px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  padding: 15px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.producto:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
 }
 
 .producto img {
   max-width: 100%;
-  border-radius: 8px;
+  border-radius: 10px;
+  margin-bottom: 10px;
 }
 
+.producto h3 {
+  margin: 10px 0 5px;
+  font-size: 1.2em;
+  color: #34495e;
+}
+
+.producto p {
+  margin: 5px 0;
+  color: #555;
+}
+
+/* ======= BOTONES ======= */
 button {
-  margin-top: 5px;
-  padding: 8px 12px;
+  margin: 6px;
+  padding: 10px 15px;
   border: none;
-  background: #4CAF50;
-  color: white;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
+  font-weight: bold;
+  transition: background 0.2s ease, transform 0.1s ease;
 }
 
 button:hover {
-  background: #45a049;
+  transform: scale(1.05);
+}
+
+/* Colores distintos según acción */
+.btn-agregar {
+  background: #4caf50;
+  color: white;
+}
+
+.btn-agregar:hover {
+  background: #43a047;
+}
+
+.btn-editar {
+  background: #2196f3;
+  color: white;
+}
+
+.btn-editar:hover {
+  background: #1976d2;
+}
+
+.btn-eliminar {
+  background: #e53935;
+  color: white;
+}
+
+.btn-eliminar:hover {
+  background: #c62828;
+}
+
+/* ======= FORMULARIOS ADMIN ======= */
+#adminPanel, #editPanel {
+  margin-top: 30px;
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  display: inline-block;
+}
+
+#adminPanel h2, #editPanel h2 {
+  margin-bottom: 15px;
+  color: #2c3e50;
 }
