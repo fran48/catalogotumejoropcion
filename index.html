@@ -185,8 +185,9 @@
       });
     }
 
-    // AGREGAR PRODUCTO
+    // AGREGAR PRODUCTO (solo admin)
     function agregarProducto() {
+      if(!isAdmin) return;
       const nombre = document.getElementById("nombre").value;
       const precio = document.getElementById("precio").value;
       const imagen = document.getElementById("imagen").value;
@@ -201,14 +202,16 @@
       }
     }
 
-    // ELIMINAR PRODUCTO
+    // ELIMINAR PRODUCTO (solo admin)
     function eliminarProducto(i) {
+      if(!isAdmin) return;
       productos.splice(i,1);
       mostrarProductos();
     }
 
-    // EDITAR PRODUCTO
+    // EDITAR PRODUCTO (solo admin)
     function editarProducto(i) {
+      if(!isAdmin) return;
       editIndex = i;
       document.getElementById("editNombre").value = productos[i].nombre;
       document.getElementById("editPrecio").value = productos[i].precio;
@@ -217,13 +220,12 @@
     }
 
     function guardarEdicion() {
-      if(editIndex !== null){
-        productos[editIndex].nombre = document.getElementById("editNombre").value;
-        productos[editIndex].precio = document.getElementById("editPrecio").value;
-        productos[editIndex].imagen = document.getElementById("editImagen").value;
-        mostrarProductos();
-        cancelarEdicion();
-      }
+      if(!isAdmin || editIndex === null) return;
+      productos[editIndex].nombre = document.getElementById("editNombre").value;
+      productos[editIndex].precio = document.getElementById("editPrecio").value;
+      productos[editIndex].imagen = document.getElementById("editImagen").value;
+      mostrarProductos();
+      cancelarEdicion();
     }
 
     function cancelarEdicion(){
