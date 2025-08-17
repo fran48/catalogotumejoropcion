@@ -118,7 +118,7 @@
   <!-- PRODUCTOS -->
   <div id="productos"></div>
 
-  <!-- PANEL ADMIN -->
+  <!-- PANEL ADMIN: SOLO SE MUESTRA AL LOGUEARSE -->
   <div id="adminPanel" class="hidden">
     <h2>Agregar Producto</h2>
     <input type="text" id="nombre" placeholder="Nombre del producto">
@@ -127,7 +127,7 @@
     <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
   </div>
 
-  <!-- PANEL EDICIÓN -->
+  <!-- PANEL EDICIÓN: SOLO SE MUESTRA AL EDITAR -->
   <div id="editPanel" class="hidden">
     <h2>Editar Producto</h2>
     <input type="text" id="editNombre" placeholder="Nuevo nombre">
@@ -233,7 +233,8 @@
       editIndex = null;
     }
 
-    mostrarProductos(); // Inicializa la vista pública
+    // Inicializa la vista pública (solo productos y login)
+    mostrarProductos();
   </script>
 
 </body>
