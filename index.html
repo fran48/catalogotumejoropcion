@@ -13,9 +13,14 @@
     color: #333;
   }
   h1 { color:#2c3e50; margin-bottom:10px; }
-  input { padding:10px; margin:8px; border-radius:6px; border:1px solid #ccc; width:250px; }
+  input, textarea { padding:10px; margin:8px; border-radius:6px; border:1px solid #ccc; width:250px; }
+  textarea { resize: vertical; height: 60px; }
   .hidden { display:none; }
-  #productos { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-top:25px; }
+  #contacto { margin-bottom: 20px; padding:20px; background:#2c3e50; color:white; border-radius:15px; }
+  #contacto h3 { margin-bottom:10px; }
+  #contacto p { margin:5px 0; font-size:1em; }
+  #contacto a { color:#4cafef; text-decoration:none; font-weight:bold; }
+  #productos { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-top:20px; }
   .producto { background:white; padding:15px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition: transform .2s, box-shadow .2s; }
   .producto:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.2); }
   .producto img { max-width:100%; border-radius:10px; margin-bottom:10px; }
@@ -30,15 +35,19 @@
   .btn-eliminar { background:#e53935; color:white; }
   .btn-eliminar:hover { background:#c62828; }
   #adminPanel,#editPanel,#login { margin-top:30px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none; }
-  footer { margin-top:40px; padding:20px; background:#2c3e50; color:white; border-radius:15px; }
-  footer h3 { margin-bottom:10px; }
-  footer p { margin:5px 0; font-size:1em; }
-  footer a { color:#4cafef; text-decoration:none; font-weight:bold; }
+  footer { margin-top:40px; padding:20px; color:#fff; }
 </style>
 </head>
 <body>
 
 <h1>📦 Catálogo de Productos</h1>
+
+<!-- CONTACTO Y DIRECCIÓN -->
+<div id="contacto">
+  <h3>📞 Contacto</h3>
+  <p>Teléfono: <a href="tel:3571314697">3571314697</a></p>
+  <p>📍 Dirección: Pasaje Jerónimos Luis de Cabrera 874</p>
+</div>
 
 <!-- LOGIN ADMIN (Visible siempre) -->
 <div id="login">
@@ -56,6 +65,7 @@
   <h2>Agregar Producto</h2>
   <input type="text" id="nombre" placeholder="Nombre del producto">
   <input type="number" id="precio" placeholder="Precio">
+  <textarea id="descripcion" placeholder="Descripción del producto"></textarea>
   <input type="text" id="imagen" placeholder="URL de la imagen">
   <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
 </div>
@@ -65,17 +75,11 @@
   <h2>Editar Producto</h2>
   <input type="text" id="editNombre" placeholder="Nuevo nombre">
   <input type="number" id="editPrecio" placeholder="Nuevo precio">
+  <textarea id="editDescripcion" placeholder="Nueva descripción"></textarea>
   <input type="text" id="editImagen" placeholder="Nueva URL imagen">
   <button class="btn-editar" onclick="guardarEdicion()">Guardar Cambios</button>
   <button class="btn-eliminar" onclick="cancelarEdicion()">Cancelar</button>
 </div>
-
-<!-- FOOTER (Visible siempre) -->
-<footer>
-  <h3>📞 Contacto</h3>
-  <p>Teléfono: <a href="tel:3571314697">3571314697</a></p>
-  <p>📍 Dirección: Pasaje Jerónimos Luis de Cabrera 874</p>
-</footer>
 
 <script>
 const ADMIN_USER = "Belen192226";
@@ -109,9 +113,10 @@ function mostrarProductos() {
   productos.forEach((p,i)=>{
     let div = document.createElement("div");
     div.className = "producto";
-    div.innerHTML = `
+    div.innerHTML=`
       <img src="${p.imagen}" alt="${p.nombre}">
       <h3>${p.nombre}</h3>
+      <p>${p.descripcion}</p>
       <p>Precio: $${p.precio}</p>
       ${isAdmin ? `<button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
                    <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>` : ''}
@@ -125,12 +130,14 @@ function agregarProducto() {
   if(!isAdmin) return;
   const nombre = document.getElementById("nombre").value;
   const precio = document.getElementById("precio").value;
+  const descripcion = document.getElementById("descripcion").value;
   const imagen = document.getElementById("imagen").value;
-  if(nombre && precio && imagen){
-    productos.push({nombre, precio, imagen});
+  if(nombre && precio && descripcion && imagen){
+    productos.push({nombre, precio, descripcion, imagen});
     mostrarProductos();
     document.getElementById("nombre").value="";
     document.getElementById("precio").value="";
+    document.getElementById("descripcion").value="";
     document.getElementById("imagen").value="";
   } else {
     alert("Complete todos los campos");
@@ -150,6 +157,7 @@ function editarProducto(i){
   editIndex = i;
   document.getElementById("editNombre").value = productos[i].nombre;
   document.getElementById("editPrecio").value = productos[i].precio;
+  document.getElementById("editDescripcion").value = productos[i].descripcion;
   document.getElementById("editImagen").value = productos[i].imagen;
   document.getElementById("editPanel").style.display = "block";
 }
@@ -158,6 +166,7 @@ function guardarEdicion(){
   if(!isAdmin || editIndex === null) return;
   productos[editIndex].nombre = document.getElementById("editNombre").value;
   productos[editIndex].precio = document.getElementById("editPrecio").value;
+  productos[editIndex].descripcion = document.getElementById("editDescripcion").value;
   productos[editIndex].imagen = document.getElementById("editImagen").value;
   mostrarProductos();
   cancelarEdicion();
