@@ -116,6 +116,30 @@
       margin-bottom: 15px;
       color: #2c3e50;
     }
+
+    /* ======= FOOTER CONTACTO ======= */
+    footer {
+      margin-top: 40px;
+      padding: 20px;
+      background: #2c3e50;
+      color: white;
+      border-radius: 15px;
+    }
+
+    footer h3 {
+      margin-bottom: 10px;
+    }
+
+    footer p {
+      margin: 5px 0;
+      font-size: 1em;
+    }
+
+    footer a {
+      color: #4cafef;
+      text-decoration: none;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -142,6 +166,13 @@
     <button class="btn-editar" onclick="guardarEdicion()">Guardar Cambios</button>
     <button class="btn-eliminar" onclick="cancelarEdicion()">Cancelar</button>
   </div>
+
+  <!-- Footer con datos de contacto -->
+  <footer>
+    <h3>📞 Contacto</h3>
+    <p>Teléfono: <a href="tel:3571314697">3571314697</a></p>
+    <p>📍 Dirección: Pasaje Jerónimo de Cabrera 874</p>
+  </footer>
 
   <script>
     let productos = [];
