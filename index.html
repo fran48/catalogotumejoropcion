@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo de Productos</title>
   <style>
-    /* ======= ESTILOS GENERALES ======= */
     body {
       font-family: 'Segoe UI', Tahoma, sans-serif;
       text-align: center;
@@ -29,7 +28,6 @@
 
     .hidden { display: none; }
 
-    /* ======= GRID DE PRODUCTOS ======= */
     #productos {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -37,7 +35,6 @@
       margin-top: 25px;
     }
 
-    /* ======= TARJETAS ======= */
     .producto {
       background: white;
       padding: 15px;
@@ -57,18 +54,9 @@
       margin-bottom: 10px;
     }
 
-    .producto h3 {
-      margin: 10px 0 5px;
-      font-size: 1.2em;
-      color: #34495e;
-    }
+    .producto h3 { margin: 10px 0 5px; font-size: 1.2em; color: #34495e; }
+    .producto p { margin: 5px 0; color: #555; }
 
-    .producto p {
-      margin: 5px 0;
-      color: #555;
-    }
-
-    /* ======= BOTONES ======= */
     button {
       margin: 6px;
       padding: 10px 15px;
@@ -79,31 +67,16 @@
       transition: background 0.2s ease, transform 0.1s ease;
     }
 
-    button:hover {
-      transform: scale(1.05);
-    }
+    button:hover { transform: scale(1.05); }
 
-    /* Colores distintos según acción */
-    .btn-agregar {
-      background: #4caf50;
-      color: white;
-    }
+    .btn-agregar { background: #4caf50; color: white; }
     .btn-agregar:hover { background: #43a047; }
-
-    .btn-editar {
-      background: #2196f3;
-      color: white;
-    }
+    .btn-editar { background: #2196f3; color: white; }
     .btn-editar:hover { background: #1976d2; }
-
-    .btn-eliminar {
-      background: #e53935;
-      color: white;
-    }
+    .btn-eliminar { background: #e53935; color: white; }
     .btn-eliminar:hover { background: #c62828; }
 
-    /* ======= FORMULARIOS ADMIN ======= */
-    #adminPanel, #editPanel {
+    #adminPanel, #editPanel, #login {
       margin-top: 30px;
       background: white;
       padding: 20px;
@@ -112,12 +85,11 @@
       display: inline-block;
     }
 
-    #adminPanel h2, #editPanel h2 {
+    #adminPanel h2, #editPanel h2, #login h2 {
       margin-bottom: 15px;
       color: #2c3e50;
     }
 
-    /* ======= FOOTER CONTACTO ======= */
     footer {
       margin-top: 40px;
       padding: 20px;
@@ -126,30 +98,28 @@
       border-radius: 15px;
     }
 
-    footer h3 {
-      margin-bottom: 10px;
-    }
-
-    footer p {
-      margin: 5px 0;
-      font-size: 1em;
-    }
-
-    footer a {
-      color: #4cafef;
-      text-decoration: none;
-      font-weight: bold;
-    }
+    footer h3 { margin-bottom: 10px; }
+    footer p { margin: 5px 0; font-size: 1em; }
+    footer a { color: #4cafef; text-decoration: none; font-weight: bold; }
   </style>
 </head>
 <body>
 
   <h1>📦 Catálogo de Productos</h1>
 
+  <!-- LOGIN ADMIN -->
+  <div id="login">
+    <h2>Login Admin</h2>
+    <input type="text" id="username" placeholder="Usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button class="btn-agregar" onclick="loginAdmin()">Entrar</button>
+  </div>
+
+  <!-- PRODUCTOS -->
   <div id="productos"></div>
 
-  <!-- Panel para agregar -->
-  <div id="adminPanel">
+  <!-- PANEL ADMIN -->
+  <div id="adminPanel" class="hidden">
     <h2>Agregar Producto</h2>
     <input type="text" id="nombre" placeholder="Nombre del producto">
     <input type="number" id="precio" placeholder="Precio">
@@ -157,7 +127,7 @@
     <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
   </div>
 
-  <!-- Panel para editar -->
+  <!-- PANEL EDICIÓN -->
   <div id="editPanel" class="hidden">
     <h2>Editar Producto</h2>
     <input type="text" id="editNombre" placeholder="Nuevo nombre">
@@ -167,17 +137,35 @@
     <button class="btn-eliminar" onclick="cancelarEdicion()">Cancelar</button>
   </div>
 
-  <!-- Footer con datos de contacto -->
+  <!-- FOOTER -->
   <footer>
     <h3>📞 Contacto</h3>
     <p>Teléfono: <a href="tel:3571314697">3571314697</a></p>
-    <p>📍 Dirección: Pasaje Jerónimo de Cabrera 874</p>
+    <p>📍 Dirección: Pasaje Jerónimos Luis de Cabrera 874</p>
   </footer>
 
   <script>
+    const ADMIN_USER = "Belen192226";
+    const ADMIN_PASS = "Fran192226";
+    let isAdmin = false;
     let productos = [];
     let editIndex = null;
 
+    // LOGIN ADMIN
+    function loginAdmin() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if(user === ADMIN_USER && pass === ADMIN_PASS) {
+        isAdmin = true;
+        document.getElementById("login").classList.add("hidden");
+        document.getElementById("adminPanel").classList.remove("hidden");
+        mostrarProductos();
+      } else {
+        alert("Usuario o contraseña incorrectos");
+      }
+    }
+
+    // MOSTRAR PRODUCTOS
     function mostrarProductos() {
       const cont = document.getElementById("productos");
       cont.innerHTML = "";
@@ -188,34 +176,38 @@
           <img src="${p.imagen}" alt="${p.nombre}">
           <h3>${p.nombre}</h3>
           <p>Precio: $${p.precio}</p>
-          <button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
-          <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
+          ${isAdmin ? `
+            <button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
+            <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
+          ` : ''}
         `;
         cont.appendChild(div);
       });
     }
 
+    // AGREGAR PRODUCTO
     function agregarProducto() {
       const nombre = document.getElementById("nombre").value;
       const precio = document.getElementById("precio").value;
       const imagen = document.getElementById("imagen").value;
-
-      if (nombre && precio && imagen) {
+      if(nombre && precio && imagen){
         productos.push({ nombre, precio, imagen });
         mostrarProductos();
         document.getElementById("nombre").value = "";
         document.getElementById("precio").value = "";
         document.getElementById("imagen").value = "";
       } else {
-        alert("Por favor complete todos los campos");
+        alert("Complete todos los campos");
       }
     }
 
+    // ELIMINAR PRODUCTO
     function eliminarProducto(i) {
-      productos.splice(i, 1);
+      productos.splice(i,1);
       mostrarProductos();
     }
 
+    // EDITAR PRODUCTO
     function editarProducto(i) {
       editIndex = i;
       document.getElementById("editNombre").value = productos[i].nombre;
@@ -225,7 +217,7 @@
     }
 
     function guardarEdicion() {
-      if (editIndex !== null) {
+      if(editIndex !== null){
         productos[editIndex].nombre = document.getElementById("editNombre").value;
         productos[editIndex].precio = document.getElementById("editPrecio").value;
         productos[editIndex].imagen = document.getElementById("editImagen").value;
@@ -234,12 +226,13 @@
       }
     }
 
-    function cancelarEdicion() {
+    function cancelarEdicion(){
       document.getElementById("editPanel").classList.add("hidden");
       editIndex = null;
     }
 
-    mostrarProductos();
+    mostrarProductos(); // Inicializa la vista pública
   </script>
+
 </body>
 </html>
