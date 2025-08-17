@@ -5,219 +5,210 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catálogo de Productos</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    .hidden { display: none; }
-    .card { border: 1px solid #ccc; padding: 10px; margin: 10px; display: inline-block; width: 200px; vertical-align: top; }
-    .card img { width: 100%; height: auto; }
-    input { margin: 5px 0; width: 100%; padding: 5px; }
-    button { padding: 5px 10px; margin-top: 5px; cursor: pointer; }
-  </style>
+    /* ======= ESTILOS GENERALES ======= */
+    body {
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
+      color: #333;
+    }
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+    h1 {
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    input {
+      padding: 10px;
+      margin: 8px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 250px;
+    }
+
+    .hidden { display: none; }
+
+    /* ======= GRID DE PRODUCTOS ======= */
+    #productos {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+      margin-top: 25px;
+    }
+
+    /* ======= TARJETAS ======= */
+    .producto {
+      background: white;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .producto:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    }
+
+    .producto img {
+      max-width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    .producto h3 {
+      margin: 10px 0 5px;
+      font-size: 1.2em;
+      color: #34495e;
+    }
+
+    .producto p {
+      margin: 5px 0;
+      color: #555;
+    }
+
+    /* ======= BOTONES ======= */
+    button {
+      margin: 6px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    button:hover {
+      transform: scale(1.05);
+    }
+
+    /* Colores distintos según acción */
+    .btn-agregar {
+      background: #4caf50;
+      color: white;
+    }
+    .btn-agregar:hover { background: #43a047; }
+
+    .btn-editar {
+      background: #2196f3;
+      color: white;
+    }
+    .btn-editar:hover { background: #1976d2; }
+
+    .btn-eliminar {
+      background: #e53935;
+      color: white;
+    }
+    .btn-eliminar:hover { background: #c62828; }
+
+    /* ======= FORMULARIOS ADMIN ======= */
+    #adminPanel, #editPanel {
+      margin-top: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      display: inline-block;
+    }
+
+    #adminPanel h2, #editPanel h2 {
+      margin-bottom: 15px;
+      color: #2c3e50;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- Login admin -->
-  <div id="login">
-    <h2>Login Admin</h2>
-    <input type="text" id="username" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button onclick="login()">Entrar</button>
-  </div>
+  <h1>📦 Catálogo de Productos</h1>
 
-  <!-- Todos pueden ver esto -->
-  <h1>Catálogo de Productos</h1>
-  <input type="text" id="search" placeholder="Buscar producto..." oninput="filtrarProductos()">
   <div id="productos"></div>
 
-  <!-- Panel admin -->
-  <div id="adminPanel" class="hidden">
+  <!-- Panel para agregar -->
+  <div id="adminPanel">
     <h2>Agregar Producto</h2>
-    <input type="text" id="nombre" placeholder="Nombre">
-    <input type="text" id="precio" placeholder="Precio">
-    <input type="text" id="descripcion" placeholder="Descripción">
-    <input type="text" id="foto" placeholder="URL de Imagen">
-    <button onclick="agregarProducto()">Agregar Producto</button>
+    <input type="text" id="nombre" placeholder="Nombre del producto">
+    <input type="number" id="precio" placeholder="Precio">
+    <input type="text" id="imagen" placeholder="URL de la imagen">
+    <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
   </div>
 
-  <!-- Panel editar producto -->
+  <!-- Panel para editar -->
   <div id="editPanel" class="hidden">
     <h2>Editar Producto</h2>
-    <input type="text" id="editNombre" placeholder="Nombre">
-    <input type="text" id="editPrecio" placeholder="Precio">
-    <input type="text" id="editDescripcion" placeholder="Descripción">
-    <input type="text" id="editFoto" placeholder="URL de Imagen">
-    <button onclick="guardarEdicion()">Guardar Cambios</button>
-    <button onclick="cancelarEdicion()">Cancelar</button>
+    <input type="text" id="editNombre" placeholder="Nuevo nombre">
+    <input type="number" id="editPrecio" placeholder="Nuevo precio">
+    <input type="text" id="editImagen" placeholder="Nueva URL imagen">
+    <button class="btn-editar" onclick="guardarEdicion()">Guardar Cambios</button>
+    <button class="btn-eliminar" onclick="cancelarEdicion()">Cancelar</button>
   </div>
 
   <script>
-    // --------------------
-    // Configuración Firebase
-    // --------------------
-    const firebaseConfig = {
-      apiKey: "AIzaSyB8CdmsQ4GUqN1m_KlHlxGhagmed8_aVpA",
-      authDomain: "producto-a6e68.firebaseapp.com",
-      projectId: "producto-a6e68",
-      storageBucket: "producto-a6e68.appspot.com",
-      messagingSenderId: "358261871993",
-      appId: "1:358261871993:web:6aff27584ed1afd7d04ba8"
-    };
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    let productos = [];
+    let editIndex = null;
 
-    // --------------------
-    // Admin
-    // --------------------
-    const USER = "Belen192226";
-    const PASS = "Fran192226";
-    let isAdmin = false;   // Estado global admin
-    let productosData = []; // Guardamos todos los productos
-    let editId = null;      // ID del producto que estamos editando
-
-    function login() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
-      if(user === USER && pass === PASS) {
-        isAdmin = true;
-        document.getElementById("login").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-        renderizarProductos(); // 🔹 Redibujar catálogo con botones admin
-      } else {
-        alert("Usuario o contraseña incorrectos");
-      }
-    }
-
-    // --------------------
-    // Escuchar cambios en productos
-    // --------------------
-    db.collection("productos").onSnapshot((querySnapshot) => {
-      productosData = [];
-      querySnapshot.forEach((doc) => {
-        productosData.push({ id: doc.id, ...doc.data() });
+    function mostrarProductos() {
+      const cont = document.getElementById("productos");
+      cont.innerHTML = "";
+      productos.forEach((p, i) => {
+        let div = document.createElement("div");
+        div.className = "producto";
+        div.innerHTML = `
+          <img src="${p.imagen}" alt="${p.nombre}">
+          <h3>${p.nombre}</h3>
+          <p>Precio: $${p.precio}</p>
+          <button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
+          <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
+        `;
+        cont.appendChild(div);
       });
-      renderizarProductos();
-    });
-
-    // --------------------
-    // Mostrar productos
-    // --------------------
-    function renderizarProductos(filtro="") {
-      const contenedor = document.getElementById("productos");
-      contenedor.innerHTML = "";
-
-      productosData
-        .filter(p => p.name.toLowerCase().includes(filtro.toLowerCase()))
-        .forEach((p) => {
-          contenedor.innerHTML += `
-            <div class="card">
-              <img src="${p.photo}" alt="${p.name}">
-              <h3>${p.name}</h3>
-              <p>${p.description}</p>
-              <p><b>$${p.price}</b></p>
-              ${isAdmin ? `
-                <button onclick="editarProducto('${p.id}')">Editar</button>
-                <button onclick="eliminarProducto('${p.id}')">Eliminar</button>
-              ` : ""}
-            </div>
-          `;
-        });
-
-      if (contenedor.innerHTML === "") {
-        contenedor.innerHTML = "<p>No hay productos</p>";
-      }
     }
 
-    // --------------------
-    // Agregar producto
-    // --------------------
     function agregarProducto() {
-      const nombre = document.getElementById("nombre").value.trim();
-      const precio = document.getElementById("precio").value.trim();
-      const descripcion = document.getElementById("descripcion").value.trim();
-      const foto = document.getElementById("foto").value.trim();
-      if(!nombre || !precio || !descripcion || !foto) {
-        alert("Completa todos los campos");
-        return;
-      }
-      db.collection("productos").add({
-        name: nombre,
-        price: parseFloat(precio),
-        description: descripcion,
-        photo: foto
-      })
-      .then(() => {
-        alert("Producto agregado correctamente");
+      const nombre = document.getElementById("nombre").value;
+      const precio = document.getElementById("precio").value;
+      const imagen = document.getElementById("imagen").value;
+
+      if (nombre && precio && imagen) {
+        productos.push({ nombre, precio, imagen });
+        mostrarProductos();
         document.getElementById("nombre").value = "";
         document.getElementById("precio").value = "";
-        document.getElementById("descripcion").value = "";
-        document.getElementById("foto").value = "";
-      })
-      .catch(err => console.error("Error:", err));
+        document.getElementById("imagen").value = "";
+      } else {
+        alert("Por favor complete todos los campos");
+      }
     }
 
-    // --------------------
-    // Eliminar producto
-    // --------------------
-    function eliminarProducto(id) {
-      db.collection("productos").doc(id).delete()
-        .then(() => console.log("Producto eliminado"))
-        .catch(err => console.error("Error:", err));
+    function eliminarProducto(i) {
+      productos.splice(i, 1);
+      mostrarProductos();
     }
 
-    // --------------------
-    // Editar producto
-    // --------------------
-    function editarProducto(id) {
-      const producto = productosData.find(p => p.id === id);
-      if(!producto) return;
-      editId = id;
-      document.getElementById("editNombre").value = producto.name;
-      document.getElementById("editPrecio").value = producto.price;
-      document.getElementById("editDescripcion").value = producto.description;
-      document.getElementById("editFoto").value = producto.photo;
-
+    function editarProducto(i) {
+      editIndex = i;
+      document.getElementById("editNombre").value = productos[i].nombre;
+      document.getElementById("editPrecio").value = productos[i].precio;
+      document.getElementById("editImagen").value = productos[i].imagen;
       document.getElementById("editPanel").classList.remove("hidden");
     }
 
     function guardarEdicion() {
-      const nombre = document.getElementById("editNombre").value.trim();
-      const precio = document.getElementById("editPrecio").value.trim();
-      const descripcion = document.getElementById("editDescripcion").value.trim();
-      const foto = document.getElementById("editFoto").value.trim();
-      if(!nombre || !precio || !descripcion || !foto) {
-        alert("Completa todos los campos");
-        return;
-      }
-      db.collection("productos").doc(editId).update({
-        name: nombre,
-        price: parseFloat(precio),
-        description: descripcion,
-        photo: foto
-      })
-      .then(() => {
-        alert("Producto actualizado correctamente");
+      if (editIndex !== null) {
+        productos[editIndex].nombre = document.getElementById("editNombre").value;
+        productos[editIndex].precio = document.getElementById("editPrecio").value;
+        productos[editIndex].imagen = document.getElementById("editImagen").value;
+        mostrarProductos();
         cancelarEdicion();
-      })
-      .catch(err => console.error("Error:", err));
+      }
     }
 
     function cancelarEdicion() {
-      editId = null;
       document.getElementById("editPanel").classList.add("hidden");
+      editIndex = null;
     }
 
-    // --------------------
-    // Filtrar productos
-    // --------------------
-    function filtrarProductos() {
-      const valor = document.getElementById("search").value;
-      renderizarProductos(valor);
-    }
-
+    mostrarProductos();
   </script>
-
 </body>
 </html>
