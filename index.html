@@ -42,6 +42,17 @@
     <button onclick="agregarProducto()">Agregar Producto</button>
   </div>
 
+  <!-- Panel editar producto -->
+  <div id="editPanel" class="hidden">
+    <h2>Editar Producto</h2>
+    <input type="text" id="editNombre" placeholder="Nombre">
+    <input type="text" id="editPrecio" placeholder="Precio">
+    <input type="text" id="editDescripcion" placeholder="Descripción">
+    <input type="text" id="editFoto" placeholder="URL de Imagen">
+    <button onclick="guardarEdicion()">Guardar Cambios</button>
+    <button onclick="cancelarEdicion()">Cancelar</button>
+  </div>
+
   <script>
     // --------------------
     // Configuración Firebase
@@ -78,25 +89,37 @@
     // --------------------
     // Mostrar productos
     // --------------------
-    function mostrarProductos(isAdmin=false, filtro="") {
-      const contenedor = document.getElementById("productos");
-      db.collection("productos").onSnapshot((querySnapshot) => {
-        contenedor.innerHTML = "";
-        querySnapshot.forEach((doc) => {
-          const p = doc.data();
-          if(p.name.toLowerCase().includes(filtro.toLowerCase())) {
-            contenedor.innerHTML += `
-              <div class="card">
-                <img src="${p.photo}" alt="${p.name}">
-                <h3>${p.name}</h3>
-                <p>${p.description}</p>
-                <p><b>$${p.price}</b></p>
-                ${isAdmin ? `<button onclick="eliminarProducto('${doc.id}')">Eliminar</button>` : ""}
-              </div>
-            `;
-          }
-        });
+    let productosData = [];
+    let editId = null; // guardamos el id del producto a editar
+
+    db.collection("productos").onSnapshot((querySnapshot) => {
+      productosData = [];
+      querySnapshot.forEach((doc) => {
+        productosData.push({ id: doc.id, ...doc.data() });
       });
+      renderizarProductos();
+    });
+
+    function renderizarProductos(filtro="") {
+      const contenedor = document.getElementById("productos");
+      const isAdmin = !document.getElementById("adminPanel").classList.contains("hidden");
+      contenedor.innerHTML = "";
+      productosData
+        .filter(p => p.name.toLowerCase().includes(filtro.toLowerCase()))
+        .forEach((p) => {
+          contenedor.innerHTML += `
+            <div class="card">
+              <img src="${p.photo}" alt="${p.name}">
+              <h3>${p.name}</h3>
+              <p>${p.description}</p>
+              <p><b>$${p.price}</b></p>
+              ${isAdmin ? `
+                <button onclick="editarProducto('${p.id}')">Editar</button>
+                <button onclick="eliminarProducto('${p.id}')">Eliminar</button>
+              ` : ""}
+            </div>
+          `;
+        });
     }
 
     // --------------------
@@ -113,7 +136,7 @@
       }
       db.collection("productos").add({
         name: nombre,
-        price: precio,
+        price: parseFloat(precio),
         description: descripcion,
         photo: foto
       })
@@ -137,20 +160,60 @@
     }
 
     // --------------------
+    // Editar producto
+    // --------------------
+    function editarProducto(id) {
+      const producto = productosData.find(p => p.id === id);
+      if(!producto) return;
+      editId = id;
+      document.getElementById("editNombre").value = producto.name;
+      document.getElementById("editPrecio").value = producto.price;
+      document.getElementById("editDescripcion").value = producto.description;
+      document.getElementById("editFoto").value = producto.photo;
+
+      document.getElementById("editPanel").classList.remove("hidden");
+    }
+
+    function guardarEdicion() {
+      const nombre = document.getElementById("editNombre").value.trim();
+      const precio = document.getElementById("editPrecio").value.trim();
+      const descripcion = document.getElementById("editDescripcion").value.trim();
+      const foto = document.getElementById("editFoto").value.trim();
+      if(!nombre || !precio || !descripcion || !foto) {
+        alert("Completa todos los campos");
+        return;
+      }
+      db.collection("productos").doc(editId).update({
+        name: nombre,
+        price: parseFloat(precio),
+        description: descripcion,
+        photo: foto
+      })
+      .then(() => {
+        alert("Producto actualizado correctamente");
+        cancelarEdicion();
+      })
+      .catch(err => console.error("Error:", err));
+    }
+
+    function cancelarEdicion() {
+      editId = null;
+      document.getElementById("editPanel").classList.add("hidden");
+    }
+
+    // --------------------
     // Filtrar productos
     // --------------------
     function filtrarProductos() {
       const valor = document.getElementById("search").value;
-      const isAdmin = !document.getElementById("adminPanel").classList.contains("hidden");
-      mostrarProductos(isAdmin, valor);
+      renderizarProductos(valor);
     }
 
     // --------------------
     // Inicializar catálogo
     // --------------------
-    mostrarProductos(false);
+    renderizarProductos();
   </script>
 
 </body>
 </html>
-
