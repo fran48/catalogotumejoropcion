@@ -1,241 +1,175 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Catálogo de Productos</title>
-  <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      text-align: center;
-      padding: 20px;
-      background: linear-gradient(135deg, #e3f2fd, #f1f8e9);
-      color: #333;
-    }
-
-    h1 {
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
-
-    input {
-      padding: 10px;
-      margin: 8px;
-      border-radius: 6px;
-      border: 1px solid #ccc;
-      width: 250px;
-    }
-
-    .hidden { display: none; }
-
-    #productos {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 20px;
-      margin-top: 25px;
-    }
-
-    .producto {
-      background: white;
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .producto:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-    }
-
-    .producto img {
-      max-width: 100%;
-      border-radius: 10px;
-      margin-bottom: 10px;
-    }
-
-    .producto h3 { margin: 10px 0 5px; font-size: 1.2em; color: #34495e; }
-    .producto p { margin: 5px 0; color: #555; }
-
-    button {
-      margin: 6px;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.2s ease, transform 0.1s ease;
-    }
-
-    button:hover { transform: scale(1.05); }
-
-    .btn-agregar { background: #4caf50; color: white; }
-    .btn-agregar:hover { background: #43a047; }
-    .btn-editar { background: #2196f3; color: white; }
-    .btn-editar:hover { background: #1976d2; }
-    .btn-eliminar { background: #e53935; color: white; }
-    .btn-eliminar:hover { background: #c62828; }
-
-    #adminPanel, #editPanel, #login {
-      margin-top: 30px;
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-      display: inline-block;
-    }
-
-    #adminPanel h2, #editPanel h2, #login h2 {
-      margin-bottom: 15px;
-      color: #2c3e50;
-    }
-
-    footer {
-      margin-top: 40px;
-      padding: 20px;
-      background: #2c3e50;
-      color: white;
-      border-radius: 15px;
-    }
-
-    footer h3 { margin-bottom: 10px; }
-    footer p { margin: 5px 0; font-size: 1em; }
-    footer a { color: #4cafef; text-decoration: none; font-weight: bold; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo de Productos</title>
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg,#e3f2fd,#f1f8e9);
+    color: #333;
+  }
+  h1 { color:#2c3e50; margin-bottom:10px; }
+  input { padding:10px; margin:8px; border-radius:6px; border:1px solid #ccc; width:250px; }
+  .hidden { display:none; }
+  #productos { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:20px; margin-top:25px; }
+  .producto { background:white; padding:15px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); transition: transform .2s, box-shadow .2s; }
+  .producto:hover { transform:translateY(-5px); box-shadow:0 8px 20px rgba(0,0,0,0.2); }
+  .producto img { max-width:100%; border-radius:10px; margin-bottom:10px; }
+  .producto h3 { margin:10px 0 5px; font-size:1.2em; color:#34495e; }
+  .producto p { margin:5px 0; color:#555; }
+  button { margin:6px; padding:10px 15px; border:none; border-radius:8px; cursor:pointer; font-weight:bold; transition: background .2s, transform .1s; }
+  button:hover { transform:scale(1.05); }
+  .btn-agregar { background:#4caf50; color:white; }
+  .btn-agregar:hover { background:#43a047; }
+  .btn-editar { background:#2196f3; color:white; }
+  .btn-editar:hover { background:#1976d2; }
+  .btn-eliminar { background:#e53935; color:white; }
+  .btn-eliminar:hover { background:#c62828; }
+  #adminPanel,#editPanel,#login { margin-top:30px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:inline-block; }
+  #adminPanel h2,#editPanel h2,#login h2 { margin-bottom:15px; color:#2c3e50; }
+  footer { margin-top:40px; padding:20px; background:#2c3e50; color:white; border-radius:15px; }
+  footer h3 { margin-bottom:10px; }
+  footer p { margin:5px 0; font-size:1em; }
+  footer a { color:#4cafef; text-decoration:none; font-weight:bold; }
+</style>
 </head>
 <body>
 
-  <h1>📦 Catálogo de Productos</h1>
+<h1>📦 Catálogo de Productos</h1>
 
-  <!-- LOGIN ADMIN -->
-  <div id="login">
-    <h2>Login Admin</h2>
-    <input type="text" id="username" placeholder="Usuario">
-    <input type="password" id="password" placeholder="Contraseña">
-    <button class="btn-agregar" onclick="loginAdmin()">Entrar</button>
-  </div>
+<!-- LOGIN ADMIN -->
+<div id="login">
+  <h2>Login Admin</h2>
+  <input type="text" id="username" placeholder="Usuario">
+  <input type="password" id="password" placeholder="Contraseña">
+  <button class="btn-agregar" onclick="loginAdmin()">Entrar</button>
+</div>
 
-  <!-- PRODUCTOS -->
-  <div id="productos"></div>
+<!-- PRODUCTOS -->
+<div id="productos"></div>
 
-  <!-- PANEL ADMIN: SOLO SE MUESTRA AL LOGUEARSE -->
-  <div id="adminPanel" class="hidden">
-    <h2>Agregar Producto</h2>
-    <input type="text" id="nombre" placeholder="Nombre del producto">
-    <input type="number" id="precio" placeholder="Precio">
-    <input type="text" id="imagen" placeholder="URL de la imagen">
-    <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
-  </div>
+<!-- PANEL ADMIN (Solo visible al login) -->
+<div id="adminPanel" class="hidden">
+  <h2>Agregar Producto</h2>
+  <input type="text" id="nombre" placeholder="Nombre del producto">
+  <input type="number" id="precio" placeholder="Precio">
+  <input type="text" id="imagen" placeholder="URL de la imagen">
+  <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
+</div>
 
-  <!-- PANEL EDICIÓN: SOLO SE MUESTRA AL EDITAR -->
-  <div id="editPanel" class="hidden">
-    <h2>Editar Producto</h2>
-    <input type="text" id="editNombre" placeholder="Nuevo nombre">
-    <input type="number" id="editPrecio" placeholder="Nuevo precio">
-    <input type="text" id="editImagen" placeholder="Nueva URL imagen">
-    <button class="btn-editar" onclick="guardarEdicion()">Guardar Cambios</button>
-    <button class="btn-eliminar" onclick="cancelarEdicion()">Cancelar</button>
-  </div>
+<!-- PANEL EDICIÓN (Solo visible al editar) -->
+<div id="editPanel" class="hidden">
+  <h2>Editar Producto</h2>
+  <input type="text" id="editNombre" placeholder="Nuevo nombre">
+  <input type="number" id="editPrecio" placeholder="Nuevo precio">
+  <input type="text" id="editImagen" placeholder="Nueva URL imagen">
+  <button class="btn-editar" onclick="guardarEdicion()">Guardar Cambios</button>
+  <button class="btn-eliminar" onclick="cancelarEdicion()">Cancelar</button>
+</div>
 
-  <!-- FOOTER -->
-  <footer>
-    <h3>📞 Contacto</h3>
-    <p>Teléfono: <a href="tel:3571314697">3571314697</a></p>
-    <p>📍 Dirección: Pasaje Jerónimos Luis de Cabrera 874</p>
-  </footer>
+<!-- FOOTER -->
+<footer>
+  <h3>📞 Contacto</h3>
+  <p>Teléfono: <a href="tel:3571314697">3571314697</a></p>
+  <p>📍 Dirección: Pasaje Jerónimos Luis de Cabrera 874</p>
+</footer>
 
-  <script>
-    const ADMIN_USER = "Belen192226";
-    const ADMIN_PASS = "Fran192226";
-    let isAdmin = false;
-    let productos = [];
-    let editIndex = null;
+<script>
+const ADMIN_USER="Belen192226";
+const ADMIN_PASS="Fran192226";
+let isAdmin=false;
+let productos=[];
+let editIndex=null;
 
-    // LOGIN ADMIN
-    function loginAdmin() {
-      const user = document.getElementById("username").value;
-      const pass = document.getElementById("password").value;
-      if(user === ADMIN_USER && pass === ADMIN_PASS) {
-        isAdmin = true;
-        document.getElementById("login").classList.add("hidden");
-        document.getElementById("adminPanel").classList.remove("hidden");
-        mostrarProductos();
-      } else {
-        alert("Usuario o contraseña incorrectos");
-      }
-    }
-
-    // MOSTRAR PRODUCTOS
-    function mostrarProductos() {
-      const cont = document.getElementById("productos");
-      cont.innerHTML = "";
-      productos.forEach((p, i) => {
-        let div = document.createElement("div");
-        div.className = "producto";
-        div.innerHTML = `
-          <img src="${p.imagen}" alt="${p.nombre}">
-          <h3>${p.nombre}</h3>
-          <p>Precio: $${p.precio}</p>
-          ${isAdmin ? `
-            <button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
-            <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
-          ` : ''}
-        `;
-        cont.appendChild(div);
-      });
-    }
-
-    // AGREGAR PRODUCTO (solo admin)
-    function agregarProducto() {
-      if(!isAdmin) return;
-      const nombre = document.getElementById("nombre").value;
-      const precio = document.getElementById("precio").value;
-      const imagen = document.getElementById("imagen").value;
-      if(nombre && precio && imagen){
-        productos.push({ nombre, precio, imagen });
-        mostrarProductos();
-        document.getElementById("nombre").value = "";
-        document.getElementById("precio").value = "";
-        document.getElementById("imagen").value = "";
-      } else {
-        alert("Complete todos los campos");
-      }
-    }
-
-    // ELIMINAR PRODUCTO (solo admin)
-    function eliminarProducto(i) {
-      if(!isAdmin) return;
-      productos.splice(i,1);
-      mostrarProductos();
-    }
-
-    // EDITAR PRODUCTO (solo admin)
-    function editarProducto(i) {
-      if(!isAdmin) return;
-      editIndex = i;
-      document.getElementById("editNombre").value = productos[i].nombre;
-      document.getElementById("editPrecio").value = productos[i].precio;
-      document.getElementById("editImagen").value = productos[i].imagen;
-      document.getElementById("editPanel").classList.remove("hidden");
-    }
-
-    function guardarEdicion() {
-      if(!isAdmin || editIndex === null) return;
-      productos[editIndex].nombre = document.getElementById("editNombre").value;
-      productos[editIndex].precio = document.getElementById("editPrecio").value;
-      productos[editIndex].imagen = document.getElementById("editImagen").value;
-      mostrarProductos();
-      cancelarEdicion();
-    }
-
-    function cancelarEdicion(){
-      document.getElementById("editPanel").classList.add("hidden");
-      editIndex = null;
-    }
-
-    // Inicializa la vista pública (solo productos y login)
+// LOGIN ADMIN
+function loginAdmin(){
+  const user=document.getElementById("username").value;
+  const pass=document.getElementById("password").value;
+  if(user===ADMIN_USER && pass===ADMIN_PASS){
+    isAdmin=true;
+    document.getElementById("login").classList.add("hidden");
+    document.getElementById("adminPanel").classList.remove("hidden");
     mostrarProductos();
-  </script>
+  }else{
+    alert("Usuario o contraseña incorrectos");
+  }
+}
+
+// MOSTRAR PRODUCTOS
+function mostrarProductos(){
+  const cont=document.getElementById("productos");
+  cont.innerHTML="";
+  productos.forEach((p,i)=>{
+    let div=document.createElement("div");
+    div.className="producto";
+    div.innerHTML=`
+      <img src="${p.imagen}" alt="${p.nombre}">
+      <h3>${p.nombre}</h3>
+      <p>Precio: $${p.precio}</p>
+      ${isAdmin ? `
+        <button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
+        <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
+      `:''}
+    `;
+    cont.appendChild(div);
+  });
+}
+
+// AGREGAR PRODUCTO (solo admin)
+function agregarProducto(){
+  if(!isAdmin) return;
+  const nombre=document.getElementById("nombre").value;
+  const precio=document.getElementById("precio").value;
+  const imagen=document.getElementById("imagen").value;
+  if(nombre && precio && imagen){
+    productos.push({nombre,precio,imagen});
+    mostrarProductos();
+    document.getElementById("nombre").value="";
+    document.getElementById("precio").value="";
+    document.getElementById("imagen").value="";
+  }else{
+    alert("Complete todos los campos");
+  }
+}
+
+// ELIMINAR PRODUCTO (solo admin)
+function eliminarProducto(i){
+  if(!isAdmin) return;
+  productos.splice(i,1);
+  mostrarProductos();
+}
+
+// EDITAR PRODUCTO (solo admin)
+function editarProducto(i){
+  if(!isAdmin) return;
+  editIndex=i;
+  document.getElementById("editNombre").value=productos[i].nombre;
+  document.getElementById("editPrecio").value=productos[i].precio;
+  document.getElementById("editImagen").value=productos[i].imagen;
+  document.getElementById("editPanel").classList.remove("hidden");
+}
+
+function guardarEdicion(){
+  if(!isAdmin || editIndex===null) return;
+  productos[editIndex].nombre=document.getElementById("editNombre").value;
+  productos[editIndex].precio=document.getElementById("editPrecio").value;
+  productos[editIndex].imagen=document.getElementById("editImagen").value;
+  mostrarProductos();
+  cancelarEdicion();
+}
+
+function cancelarEdicion(){
+  document.getElementById("editPanel").classList.add("hidden");
+  editIndex=null;
+}
+
+// Inicializa vista pública
+mostrarProductos();
+</script>
 
 </body>
 </html>
