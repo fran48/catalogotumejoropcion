@@ -34,7 +34,7 @@
   .btn-editar:hover { background:#1976d2; }
   .btn-eliminar { background:#e53935; color:white; }
   .btn-eliminar:hover { background:#c62828; }
-  #adminPanel,#editPanel,#login { margin-top:30px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none; }
+  #adminPanel,#editPanel,#login { margin-top:30px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); }
 </style>
 
 <!-- Firebase -->
@@ -64,8 +64,8 @@
 <!-- PRODUCTOS -->
 <div id="productos"></div>
 
-<!-- PANEL ADMIN -->
-<div id="adminPanel">
+<!-- PANEL ADMIN (inicialmente oculto) -->
+<div id="adminPanel" class="hidden">
   <h2>Agregar Producto</h2>
   <input type="text" id="nombre" placeholder="Nombre del producto">
   <input type="number" id="precio" placeholder="Precio">
@@ -74,8 +74,8 @@
   <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
 </div>
 
-<!-- PANEL EDICIÓN -->
-<div id="editPanel">
+<!-- PANEL EDICIÓN (inicialmente oculto) -->
+<div id="editPanel" class="hidden">
   <h2>Editar Producto</h2>
   <input type="text" id="editNombre" placeholder="Nuevo nombre">
   <input type="number" id="editPrecio" placeholder="Nuevo precio">
@@ -111,10 +111,11 @@ const db = firebase.firestore();
 function loginAdmin() {
   const user = document.getElementById("username").value;
   const pass = document.getElementById("password").value;
+
   if(user === ADMIN_USER && pass === ADMIN_PASS) {
     isAdmin = true;
     document.getElementById("login").style.display = "none";
-    document.getElementById("adminPanel").style.display = "block";
+    document.getElementById("adminPanel").classList.remove("hidden");
     mostrarProductos();
   } else {
     alert("Usuario o contraseña incorrectos");
@@ -191,7 +192,7 @@ function editarProducto(id) {
       document.getElementById("editPrecio").value = p.precio;
       document.getElementById("editDescripcion").value = p.descripcion;
       document.getElementById("editImagen").value = p.imagen;
-      document.getElementById("editPanel").style.display = "block";
+      document.getElementById("editPanel").classList.remove("hidden");
     });
 }
 
@@ -204,16 +205,21 @@ function guardarEdicion() {
 
   db.collection("productos").doc(editId).update({nombre, precio, descripcion, imagen})
     .then(() => {
-      document.getElementById("editPanel").style.display = "none";
+      document.getElementById("editPanel").classList.add("hidden");
       editId = null;
     })
     .catch(err => console.error("Error al actualizar producto:", err));
 }
 
 function cancelarEdicion() {
-  document.getElementById("editPanel").style.display = "none";
+  document.getElementById("editPanel").classList.add("hidden");
   editId = null;
 }
+
+// --------------------
+// Inicializar productos
+// --------------------
+mostrarProductos();
 </script>
 
 </body>
