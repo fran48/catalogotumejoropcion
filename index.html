@@ -35,8 +35,12 @@
   .btn-eliminar { background:#e53935; color:white; }
   .btn-eliminar:hover { background:#c62828; }
   #adminPanel,#editPanel,#login { margin-top:30px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none; }
-  footer { margin-top:40px; padding:20px; color:#fff; }
 </style>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
 </head>
 <body>
 
@@ -49,7 +53,7 @@
   <p>📍 Dirección: Pasaje Jerónimos Luis de Cabrera 874</p>
 </div>
 
-<!-- LOGIN ADMIN (Visible siempre) -->
+<!-- LOGIN ADMIN -->
 <div id="login">
   <h2>Login Admin</h2>
   <input type="text" id="username" placeholder="Usuario">
@@ -57,10 +61,10 @@
   <button class="btn-agregar" onclick="loginAdmin()">Entrar</button>
 </div>
 
-<!-- PRODUCTOS (Visible siempre) -->
+<!-- PRODUCTOS -->
 <div id="productos"></div>
 
-<!-- PANEL ADMIN (Solo aparece al loguearse) -->
+<!-- PANEL ADMIN -->
 <div id="adminPanel">
   <h2>Agregar Producto</h2>
   <input type="text" id="nombre" placeholder="Nombre del producto">
@@ -70,7 +74,7 @@
   <button class="btn-agregar" onclick="agregarProducto()">Agregar Producto</button>
 </div>
 
-<!-- PANEL EDICIÓN (Solo visible al editar) -->
+<!-- PANEL EDICIÓN -->
 <div id="editPanel">
   <h2>Editar Producto</h2>
   <input type="text" id="editNombre" placeholder="Nuevo nombre">
@@ -85,96 +89,130 @@
 const ADMIN_USER = "Belen192226";
 const ADMIN_PASS = "Fran192226";
 let isAdmin = false;
-let productos = [];
-let editIndex = null;
+let editId = null;
 
-// Inicializa: mostrar login y productos (solo vista pública)
-document.getElementById("login").style.display = "block";
-mostrarProductos();
+// --------------------
+// Configuración Firebase
+// --------------------
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "producto-a6e68.firebaseapp.com",
+  projectId: "producto-a6e68",
+  storageBucket: "producto-a6e68.appspot.com",
+  messagingSenderId: "358261871993",
+  appId: "1:358261871993:web:6aff27584ed1afd7d04ba8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
+// --------------------
 // LOGIN ADMIN
+// --------------------
 function loginAdmin() {
   const user = document.getElementById("username").value;
   const pass = document.getElementById("password").value;
   if(user === ADMIN_USER && pass === ADMIN_PASS) {
     isAdmin = true;
-    document.getElementById("login").style.display = "none";       // Oculta login
-    document.getElementById("adminPanel").style.display = "block"; // Muestra panel admin
-    mostrarProductos(); // Vuelve a renderizar con botones de editar/eliminar
+    document.getElementById("login").style.display = "none";
+    document.getElementById("adminPanel").style.display = "block";
+    mostrarProductos();
   } else {
     alert("Usuario o contraseña incorrectos");
   }
 }
 
+// --------------------
 // MOSTRAR PRODUCTOS
+// --------------------
 function mostrarProductos() {
   const cont = document.getElementById("productos");
-  cont.innerHTML = "";
-  productos.forEach((p,i)=>{
-    let div = document.createElement("div");
-    div.className = "producto";
-    div.innerHTML=`
-      <img src="${p.imagen}" alt="${p.nombre}">
-      <h3>${p.nombre}</h3>
-      <p>${p.descripcion}</p>
-      <p>Precio: $${p.precio}</p>
-      ${isAdmin ? `<button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
-                   <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>` : ''}
-    `;
-    cont.appendChild(div);
+  db.collection("productos").onSnapshot(snapshot => {
+    cont.innerHTML = "";
+    snapshot.forEach(doc => {
+      const p = doc.data();
+      const div = document.createElement("div");
+      div.className = "producto";
+      div.innerHTML = `
+        <img src="${p.imagen}" alt="${p.nombre}">
+        <h3>${p.nombre}</h3>
+        <p>${p.descripcion}</p>
+        <p>Precio: $${p.precio}</p>
+        ${isAdmin ? `<button class="btn-editar" onclick="editarProducto('${doc.id}')">Editar</button>
+                     <button class="btn-eliminar" onclick="eliminarProducto('${doc.id}')">Eliminar</button>` : ''}
+      `;
+      cont.appendChild(div);
+    });
   });
 }
 
-// AGREGAR PRODUCTO (solo admin)
+// --------------------
+// AGREGAR PRODUCTO
+// --------------------
 function agregarProducto() {
   if(!isAdmin) return;
   const nombre = document.getElementById("nombre").value;
   const precio = document.getElementById("precio").value;
   const descripcion = document.getElementById("descripcion").value;
   const imagen = document.getElementById("imagen").value;
-  if(nombre && precio && descripcion && imagen){
-    productos.push({nombre, precio, descripcion, imagen});
-    mostrarProductos();
-    document.getElementById("nombre").value="";
-    document.getElementById("precio").value="";
-    document.getElementById("descripcion").value="";
-    document.getElementById("imagen").value="";
+
+  if(nombre && precio && descripcion && imagen) {
+    db.collection("productos").add({nombre, precio, descripcion, imagen})
+      .then(() => {
+        document.getElementById("nombre").value="";
+        document.getElementById("precio").value="";
+        document.getElementById("descripcion").value="";
+        document.getElementById("imagen").value="";
+      })
+      .catch(err => console.error("Error al agregar producto:", err));
   } else {
     alert("Complete todos los campos");
   }
 }
 
-// ELIMINAR PRODUCTO (solo admin)
-function eliminarProducto(i){
+// --------------------
+// ELIMINAR PRODUCTO
+// --------------------
+function eliminarProducto(id) {
   if(!isAdmin) return;
-  productos.splice(i,1);
-  mostrarProductos();
+  db.collection("productos").doc(id).delete()
+    .catch(err => console.error("Error al eliminar producto:", err));
 }
 
-// EDITAR PRODUCTO (solo admin)
-function editarProducto(i){
+// --------------------
+// EDITAR PRODUCTO
+// --------------------
+function editarProducto(id) {
   if(!isAdmin) return;
-  editIndex = i;
-  document.getElementById("editNombre").value = productos[i].nombre;
-  document.getElementById("editPrecio").value = productos[i].precio;
-  document.getElementById("editDescripcion").value = productos[i].descripcion;
-  document.getElementById("editImagen").value = productos[i].imagen;
-  document.getElementById("editPanel").style.display = "block";
+  editId = id;
+  db.collection("productos").doc(id).get()
+    .then(doc => {
+      const p = doc.data();
+      document.getElementById("editNombre").value = p.nombre;
+      document.getElementById("editPrecio").value = p.precio;
+      document.getElementById("editDescripcion").value = p.descripcion;
+      document.getElementById("editImagen").value = p.imagen;
+      document.getElementById("editPanel").style.display = "block";
+    });
 }
 
-function guardarEdicion(){
-  if(!isAdmin || editIndex === null) return;
-  productos[editIndex].nombre = document.getElementById("editNombre").value;
-  productos[editIndex].precio = document.getElementById("editPrecio").value;
-  productos[editIndex].descripcion = document.getElementById("editDescripcion").value;
-  productos[editIndex].imagen = document.getElementById("editImagen").value;
-  mostrarProductos();
-  cancelarEdicion();
+function guardarEdicion() {
+  if(!isAdmin || !editId) return;
+  const nombre = document.getElementById("editNombre").value;
+  const precio = document.getElementById("editPrecio").value;
+  const descripcion = document.getElementById("editDescripcion").value;
+  const imagen = document.getElementById("editImagen").value;
+
+  db.collection("productos").doc(editId).update({nombre, precio, descripcion, imagen})
+    .then(() => {
+      document.getElementById("editPanel").style.display = "none";
+      editId = null;
+    })
+    .catch(err => console.error("Error al actualizar producto:", err));
 }
 
-function cancelarEdicion(){
+function cancelarEdicion() {
   document.getElementById("editPanel").style.display = "none";
-  editIndex = null;
+  editId = null;
 }
 </script>
 
