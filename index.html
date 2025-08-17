@@ -29,8 +29,7 @@
   .btn-editar:hover { background:#1976d2; }
   .btn-eliminar { background:#e53935; color:white; }
   .btn-eliminar:hover { background:#c62828; }
-  #adminPanel,#editPanel,#login { margin-top:30px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:inline-block; }
-  #adminPanel h2,#editPanel h2,#login h2 { margin-bottom:15px; color:#2c3e50; }
+  #adminPanel,#editPanel,#login { margin-top:30px; background:white; padding:20px; border-radius:15px; box-shadow:0 4px 12px rgba(0,0,0,0.15); display:none; }
   footer { margin-top:40px; padding:20px; background:#2c3e50; color:white; border-radius:15px; }
   footer h3 { margin-bottom:10px; }
   footer p { margin:5px 0; font-size:1em; }
@@ -41,7 +40,7 @@
 
 <h1>📦 Catálogo de Productos</h1>
 
-<!-- LOGIN ADMIN -->
+<!-- LOGIN ADMIN (Visible siempre) -->
 <div id="login">
   <h2>Login Admin</h2>
   <input type="text" id="username" placeholder="Usuario">
@@ -49,11 +48,11 @@
   <button class="btn-agregar" onclick="loginAdmin()">Entrar</button>
 </div>
 
-<!-- PRODUCTOS -->
+<!-- PRODUCTOS (Visible siempre) -->
 <div id="productos"></div>
 
-<!-- PANEL ADMIN (Solo visible al login) -->
-<div id="adminPanel" class="hidden">
+<!-- PANEL ADMIN (Solo aparece al loguearse) -->
+<div id="adminPanel">
   <h2>Agregar Producto</h2>
   <input type="text" id="nombre" placeholder="Nombre del producto">
   <input type="number" id="precio" placeholder="Precio">
@@ -62,7 +61,7 @@
 </div>
 
 <!-- PANEL EDICIÓN (Solo visible al editar) -->
-<div id="editPanel" class="hidden">
+<div id="editPanel">
   <h2>Editar Producto</h2>
   <input type="text" id="editNombre" placeholder="Nuevo nombre">
   <input type="number" id="editPrecio" placeholder="Nuevo precio">
@@ -71,7 +70,7 @@
   <button class="btn-eliminar" onclick="cancelarEdicion()">Cancelar</button>
 </div>
 
-<!-- FOOTER -->
+<!-- FOOTER (Visible siempre) -->
 <footer>
   <h3>📞 Contacto</h3>
   <p>Teléfono: <a href="tel:3571314697">3571314697</a></p>
@@ -79,59 +78,61 @@
 </footer>
 
 <script>
-const ADMIN_USER="Belen192226";
-const ADMIN_PASS="Fran192226";
-let isAdmin=false;
-let productos=[];
-let editIndex=null;
+const ADMIN_USER = "Belen192226";
+const ADMIN_PASS = "Fran192226";
+let isAdmin = false;
+let productos = [];
+let editIndex = null;
+
+// Inicializa: mostrar login y productos (solo vista pública)
+document.getElementById("login").style.display = "block";
+mostrarProductos();
 
 // LOGIN ADMIN
-function loginAdmin(){
-  const user=document.getElementById("username").value;
-  const pass=document.getElementById("password").value;
-  if(user===ADMIN_USER && pass===ADMIN_PASS){
-    isAdmin=true;
-    document.getElementById("login").classList.add("hidden");
-    document.getElementById("adminPanel").classList.remove("hidden");
-    mostrarProductos();
-  }else{
+function loginAdmin() {
+  const user = document.getElementById("username").value;
+  const pass = document.getElementById("password").value;
+  if(user === ADMIN_USER && pass === ADMIN_PASS) {
+    isAdmin = true;
+    document.getElementById("login").style.display = "none";       // Oculta login
+    document.getElementById("adminPanel").style.display = "block"; // Muestra panel admin
+    mostrarProductos(); // Vuelve a renderizar con botones de editar/eliminar
+  } else {
     alert("Usuario o contraseña incorrectos");
   }
 }
 
 // MOSTRAR PRODUCTOS
-function mostrarProductos(){
-  const cont=document.getElementById("productos");
-  cont.innerHTML="";
+function mostrarProductos() {
+  const cont = document.getElementById("productos");
+  cont.innerHTML = "";
   productos.forEach((p,i)=>{
-    let div=document.createElement("div");
-    div.className="producto";
-    div.innerHTML=`
+    let div = document.createElement("div");
+    div.className = "producto";
+    div.innerHTML = `
       <img src="${p.imagen}" alt="${p.nombre}">
       <h3>${p.nombre}</h3>
       <p>Precio: $${p.precio}</p>
-      ${isAdmin ? `
-        <button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
-        <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>
-      `:''}
+      ${isAdmin ? `<button class="btn-editar" onclick="editarProducto(${i})">Editar</button>
+                   <button class="btn-eliminar" onclick="eliminarProducto(${i})">Eliminar</button>` : ''}
     `;
     cont.appendChild(div);
   });
 }
 
 // AGREGAR PRODUCTO (solo admin)
-function agregarProducto(){
+function agregarProducto() {
   if(!isAdmin) return;
-  const nombre=document.getElementById("nombre").value;
-  const precio=document.getElementById("precio").value;
-  const imagen=document.getElementById("imagen").value;
+  const nombre = document.getElementById("nombre").value;
+  const precio = document.getElementById("precio").value;
+  const imagen = document.getElementById("imagen").value;
   if(nombre && precio && imagen){
-    productos.push({nombre,precio,imagen});
+    productos.push({nombre, precio, imagen});
     mostrarProductos();
     document.getElementById("nombre").value="";
     document.getElementById("precio").value="";
     document.getElementById("imagen").value="";
-  }else{
+  } else {
     alert("Complete todos los campos");
   }
 }
@@ -146,29 +147,26 @@ function eliminarProducto(i){
 // EDITAR PRODUCTO (solo admin)
 function editarProducto(i){
   if(!isAdmin) return;
-  editIndex=i;
-  document.getElementById("editNombre").value=productos[i].nombre;
-  document.getElementById("editPrecio").value=productos[i].precio;
-  document.getElementById("editImagen").value=productos[i].imagen;
-  document.getElementById("editPanel").classList.remove("hidden");
+  editIndex = i;
+  document.getElementById("editNombre").value = productos[i].nombre;
+  document.getElementById("editPrecio").value = productos[i].precio;
+  document.getElementById("editImagen").value = productos[i].imagen;
+  document.getElementById("editPanel").style.display = "block";
 }
 
 function guardarEdicion(){
-  if(!isAdmin || editIndex===null) return;
-  productos[editIndex].nombre=document.getElementById("editNombre").value;
-  productos[editIndex].precio=document.getElementById("editPrecio").value;
-  productos[editIndex].imagen=document.getElementById("editImagen").value;
+  if(!isAdmin || editIndex === null) return;
+  productos[editIndex].nombre = document.getElementById("editNombre").value;
+  productos[editIndex].precio = document.getElementById("editPrecio").value;
+  productos[editIndex].imagen = document.getElementById("editImagen").value;
   mostrarProductos();
   cancelarEdicion();
 }
 
 function cancelarEdicion(){
-  document.getElementById("editPanel").classList.add("hidden");
-  editIndex=null;
+  document.getElementById("editPanel").style.display = "none";
+  editIndex = null;
 }
-
-// Inicializa vista pública
-mostrarProductos();
 </script>
 
 </body>
